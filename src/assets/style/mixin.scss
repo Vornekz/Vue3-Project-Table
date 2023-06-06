@@ -1,0 +1,19 @@
+@mixin searchBorder($width, $radius) {
+  width: $width;
+  height: 35px;
+  border: 1px solid #d7d4d4;
+  border-radius: $radius;
+  outline: none;
+
+  &:hover {
+    border: 2px solid #000;
+  }
+}
+
+@mixin countCircle() {
+  min-width: 25px;
+  padding: 5px;
+  background-color: #e9edf5;
+  border-radius: 15px;
+  text-align: center;
+}
