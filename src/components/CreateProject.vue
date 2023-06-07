@@ -3,7 +3,7 @@ import VueDatePicker from "@vuepic/vue-datepicker";
 import { DatePickerInstance } from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
 import { Options, useProjectDate } from "@/store/projectDate.ts";
-import { reactive, ref, watch } from "vue";
+import { reactive, ref, watch, watchEffect } from "vue";
 
 interface Status {
   status: string;
@@ -11,7 +11,7 @@ interface Status {
 }
 
 const props = defineProps<{
-  windowClosed: boolean;
+  windowOpen: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -19,7 +19,7 @@ const emit = defineEmits<{
 }>();
 
 const projectDate = useProjectDate();
-const select = ref("range");
+const select = ref("start");
 const redStyle = ref(false);
 const datepicker = ref<DatePickerInstance>(null);
 const datepickerRange = ref<DatePickerInstance>(null);
@@ -28,7 +28,7 @@ const updateOption = reactive<Options>({
   name: "",
   status: "Not Started",
   select: "start",
-  timeline: null,
+  timeline: new Date(),
 });
 
 const statusInput = ref<Status[]>([
@@ -55,18 +55,33 @@ const statusInput = ref<Status[]>([
 ]);
 
 const addAndClose = () => {
-  if (updateOption.name === "") {
+  if (updateOption.name.trim() === "") {
     redStyle.value = true;
+    updateOption.name = "";
   } else {
     redStyle.value = false;
     projectDate.newProjectAdd(updateOption);
     emit("closeOpenWindow");
+    reset();
   }
 };
 
+const reset = () => {
+  updateOption.name = "";
+  updateOption.select = "start";
+  updateOption.status = "Not Started";
+  updateOption.timeline = new Date();
+};
+
+watchEffect(() => {
+  if (props.windowOpen === true) {
+    updateOption.timeline = new Date();
+  }
+});
+
 watch(select, (newValue) => {
   if (newValue === "start" && datepicker) {
-    updateOption.timeline = null;
+    updateOption.timeline = new Date();
     datepicker.value?.clearValue;
   }
   if (newValue === "range" && datepickerRange) {
@@ -74,10 +89,16 @@ watch(select, (newValue) => {
     datepickerRange.value?.clearValue;
   }
 });
+
+watch(updateOption, (newValue) => {
+  if (newValue.name.trim() !== "") {
+    redStyle.value = false;
+  }
+});
 </script>
 
 <template>
-  <section class="create" v-if="props.windowClosed">
+  <section class="create" v-if="props.windowOpen">
     <header class="create__header">
       <h3>Add new Project</h3>
     </header>
@@ -161,10 +182,6 @@ watch(select, (newValue) => {
 </template>
 
 <style scoped lang="scss">
-.error {
-  border-color: red;
-}
-
 @import "@/assets/style/mixin";
 
 .create {
@@ -198,6 +215,11 @@ watch(select, (newValue) => {
 
     &__label {
       margin-bottom: 10px;
+    }
+
+    .error {
+      border-color: red;
+      outline-color: red;
     }
 
     &__input {

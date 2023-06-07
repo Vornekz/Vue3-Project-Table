@@ -1,13 +1,21 @@
 <script setup lang="ts">
 import { ref } from "vue";
+import { useSelectIndex } from "@/store/selectIndex";
 import MainNavGroup from "@/components/MainNavGroup.vue";
 import CreateProject from "@/components/CreateProject.vue";
 
-let windowClosed = ref(true);
+let selectIndex = useSelectIndex();
+let selectFilterElement = selectIndex.selectFilterElement;
+let windowOpen = ref(false);
 let selectedCheckbox = ref(20);
+let filterSelect = ref("All");
+
+const changeName = () => {
+  filterSelect.value = selectIndex.newName;
+};
 
 const openWindow = () => {
-  windowClosed.value = !windowClosed.value;
+  windowOpen.value = !windowOpen.value;
 };
 </script>
 
@@ -34,8 +42,20 @@ const openWindow = () => {
               <use xlink:href="@/assets/svg/sprite.svg#group"></use>
             </svg>
           </label>
-          <select name="group" id="group" class="search__filter-select">
-            <option value="All" selected hidden>All</option>
+          <select
+            name="group"
+            id="group"
+            class="search__filter-select"
+            v-model="filterSelect"
+            @change="selectFilterElement(filterSelect)"
+          >
+            <option value="All" selected>All</option>
+            <option value="Not started">Not started</option>
+            <option value="Planing">Planing</option>
+            <option value="In progress">In progress</option>
+            <option value="Completed">Completed</option>
+            <option value="Dropped">Dropped</option>
+            <option value="Archived">Archived</option>
           </select>
         </div>
         <div class="search__input">
@@ -55,18 +75,13 @@ const openWindow = () => {
       </form>
       <button class="mainNav__button" @click="openWindow">
         <svg>
-          <use
-            xlink:href="@/assets/svgnpm install @vuepic/vue-datepicker/sprite.svg#plus"
-          ></use>
+          <use xlink:href="@/assets/svg/sprite.svg#plus"></use>
         </svg>
         New Project
       </button>
     </div>
-    <MainNavGroup class="mainNavGroup" />
-    <CreateProject
-      :window-closed="windowClosed"
-      @close-open-window="openWindow"
-    />
+    <MainNavGroup class="mainNavGroup" @change-filter-value="changeName" />
+    <CreateProject :window-open="windowOpen" @close-open-window="openWindow" />
   </section>
 </template>
 
@@ -128,7 +143,7 @@ const openWindow = () => {
       }
 
       &-select {
-        @include searchBorder(80px, 6px 0 0 6px);
+        @include searchBorder(unset, 6px 0 0 6px);
         padding-left: 30px;
       }
     }

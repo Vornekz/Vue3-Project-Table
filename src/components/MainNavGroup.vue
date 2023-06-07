@@ -1,57 +1,18 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { useSelectIndex } from "@/store/selectIndex";
 
-interface GroupType {
-  name: string;
-  count: number;
-  selected: boolean;
-}
+const emit = defineEmits<{
+  (e: "changeFilterValue"): void;
+}>();
 
-let selectedIndex = ref(0);
+const selectIndex = useSelectIndex();
+const group = selectIndex.group;
+const selectElement = selectIndex.selectElement;
 
-function selectElement(index: number) {
-  group.value[selectedIndex.value].selected = false;
-  selectedIndex.value = index;
-  group.value[selectedIndex.value].selected = true;
-}
-
-const group = ref<GroupType[]>([
-  {
-    name: "All",
-    count: 0,
-    selected: true,
-  },
-  {
-    name: "Not started",
-    count: 0,
-    selected: false,
-  },
-  {
-    name: "Planing",
-    count: 0,
-    selected: false,
-  },
-  {
-    name: "In progress",
-    count: 0,
-    selected: false,
-  },
-  {
-    name: "Completed",
-    count: 0,
-    selected: false,
-  },
-  {
-    name: "Dropped",
-    count: 0,
-    selected: false,
-  },
-  {
-    name: "Archived",
-    count: 0,
-    selected: false,
-  },
-]);
+const select = (i: number) => {
+  selectElement(i);
+  emit("changeFilterValue");
+};
 </script>
 
 <template>
@@ -61,7 +22,7 @@ const group = ref<GroupType[]>([
       v-for="(element, i) in group"
       :key="`element-${i}`"
       :class="{ selected: element.selected }"
-      @click="selectElement(i)"
+      @click="select(i)"
     >
       <p class="group__element-text">{{ element.name }}</p>
       <span class="group__element-count">{{ element.count }}</span>
