@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { reactive } from "vue";
+import { reactive, ref } from "vue";
 
 export interface Options {
   name: string;
@@ -9,16 +9,18 @@ export interface Options {
 }
 
 export const useProjectDate = defineStore("project-date", () => {
-  const projectOptions = reactive<Options>({
-    name: "",
-    status: "",
-    select: "",
-    timeline: null,
-  });
+  const projectOptions = ref<Options[]>([]);
 
-  function newProjectAdd(updateOption: Options) {
-    Object.assign(projectOptions, updateOption);
-  }
+  const newProjectAdd = (updateOption: Options) => {
+    const newOption = reactive<Options>({
+      name: "",
+      status: "",
+      select: "",
+      timeline: null,
+    });
+    Object.assign(newOption, updateOption);
+    projectOptions.value.push(newOption);
+  };
 
   return { projectOptions, newProjectAdd };
 });

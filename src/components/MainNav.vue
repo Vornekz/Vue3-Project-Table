@@ -172,6 +172,7 @@ const openWindow = () => {
 
   &__button {
     display: flex;
+    margin: 0 20px;
     align-items: center;
     justify-content: space-evenly;
     justify-self: flex-end;

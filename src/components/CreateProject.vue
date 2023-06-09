@@ -21,6 +21,7 @@ const emit = defineEmits<{
 const projectDate = useProjectDate();
 const select = ref("start");
 const redStyle = ref(false);
+const redDateStyle = ref(false);
 const datepicker = ref<DatePickerInstance>(null);
 const datepickerRange = ref<DatePickerInstance>(null);
 
@@ -55,14 +56,22 @@ const statusInput = ref<Status[]>([
 ]);
 
 const addAndClose = () => {
+  if (updateOption.status === "Not Started") {
+    updateOption.timeline = null;
+  }
   if (updateOption.name.trim() === "") {
     redStyle.value = true;
     updateOption.name = "";
+  } else if (
+    (updateOption.status === "Completed" ||
+      updateOption.status === "Dropped") &&
+    updateOption.timeline === null
+  ) {
+    redDateStyle.value = true;
   } else {
     redStyle.value = false;
     projectDate.newProjectAdd(updateOption);
     emit("closeOpenWindow");
-    reset();
   }
 };
 
@@ -71,11 +80,24 @@ const reset = () => {
   updateOption.select = "start";
   updateOption.status = "Not Started";
   updateOption.timeline = new Date();
+  select.value = "start";
 };
 
 watchEffect(() => {
   if (props.windowOpen === true) {
     updateOption.timeline = new Date();
+    reset();
+  }
+});
+
+watchEffect(() => {
+  if (
+    updateOption.status === "Completed" ||
+    updateOption.status === "Dropped"
+  ) {
+    select.value = "range";
+  } else {
+    select.value = "start";
   }
 });
 
@@ -93,6 +115,10 @@ watch(select, (newValue) => {
 watch(updateOption, (newValue) => {
   if (newValue.name.trim() !== "") {
     redStyle.value = false;
+  }
+
+  if (newValue.timeline !== null) {
+    redDateStyle.value = false;
   }
 });
 </script>
@@ -112,7 +138,7 @@ watch(updateOption, (newValue) => {
           class="project-name__input"
           :class="{ error: redStyle }"
           required
-          maxlength="30"
+          maxlength="25"
           id="projectName"
           v-model="updateOption.name"
         />
@@ -140,7 +166,10 @@ watch(updateOption, (newValue) => {
           name="status"
         />
       </div>
-      <div class="project-timeline">
+      <div
+        class="project-timeline"
+        v-if="updateOption.status !== 'Not Started'"
+      >
         <h4 class="project-timeline__title">Project timeline</h4>
         <select
           name="timeGroup"
@@ -148,7 +177,15 @@ watch(updateOption, (newValue) => {
           v-model="select"
           class="project-timeline__select"
         >
-          <option value="start">Start time</option>
+          <option
+            value="start"
+            v-if="
+              updateOption.status !== 'Completed' &&
+              updateOption.status !== 'Dropped'
+            "
+          >
+            Start time
+          </option>
           <option value="range">Range time</option>
         </select>
         <div class="project-timeline__date" v-if="select === 'start'">
@@ -167,6 +204,7 @@ watch(updateOption, (newValue) => {
             v-model="updateOption.timeline"
             format="MM/dd/yyyy HH:mm - MM/dd/yyyy HH:mm"
             placeholder="DD/MM/YYYY ~ DD/MM/YYYY"
+            :class="{ errorDate: redDateStyle }"
             range
             :required="select === 'range'"
           >
@@ -185,6 +223,8 @@ watch(updateOption, (newValue) => {
 @import "@/assets/style/mixin";
 
 .create {
+  display: flex;
+  flex-direction: column;
   position: absolute;
   left: 45%;
   top: 30%;
@@ -205,6 +245,7 @@ watch(updateOption, (newValue) => {
 
   &__project {
     padding: 0 20px;
+    flex-grow: 1;
   }
 
   .project-name {
@@ -281,6 +322,9 @@ watch(updateOption, (newValue) => {
     }
 
     &__range {
+      .errorDate {
+        border: 1px solid red;
+      }
       .mx-datepicker {
         width: 250px;
       }
@@ -289,6 +333,7 @@ watch(updateOption, (newValue) => {
 
   &__footer {
     display: flex;
+    justify-self: flex-end;
     justify-content: flex-end;
     height: 60px;
     padding: 15px;
