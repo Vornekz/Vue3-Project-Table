@@ -1,13 +1,17 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { useSelectIndex } from "@/store/selectIndex";
+import { useProjectManipulation } from "@/store/projectManipulation";
+import { useProjectDate } from "@/store/projectDate";
 import MainNavGroup from "@/components/MainNavGroup.vue";
 import CreateProject from "@/components/CreateProject.vue";
 
 let selectIndex = useSelectIndex();
+let selected = useProjectManipulation();
+const porjectDate = useProjectDate();
 let selectFilterElement = selectIndex.selectFilterElement;
+const action = ref("Actions");
 let windowOpen = ref(false);
-let selectedCheckbox = ref(20);
 let filterSelect = ref("All");
 
 const changeName = () => {
@@ -17,6 +21,20 @@ const changeName = () => {
 const openWindow = () => {
   windowOpen.value = !windowOpen.value;
 };
+
+const actionAcept = () => {
+  if (action.value === "Delete" && selected.selectedProject.length > 0) {
+    selected.selectedProject.forEach((item) => {
+      let index = porjectDate.projectOptions.findIndex(
+        (obj) => obj.name === item.name
+      );
+      porjectDate.projectOptions.splice(index, 1);
+    });
+
+    selected.selectedProject.length = 0;
+    selected.count = 0;
+  }
+};
 </script>
 
 <template>
@@ -24,16 +42,26 @@ const openWindow = () => {
     <div class="mainNav">
       <div class="select">
         <label for="actions" class="select__label">
-          <span>{{ selectedCheckbox }}</span>
+          <span>{{ selected.count }}</span>
           Selected
         </label>
-        <select name="actions" id="actions" class="select__actions">
+        <select
+          name="actions"
+          id="actions"
+          class="select__actions"
+          v-model="action"
+        >
           <option value="Actions" selected hidden>Actions</option>
           <option value="Edit">Edit</option>
           <option value="Archive">Archive</option>
           <option value="Delete">Delete</option>
         </select>
-        <button class="select__button">&#10005;</button>
+        <button class="select__button" @click="selected.checkFalse">
+          &#10005;
+        </button>
+        <button class="select__button confirm" @click="actionAcept">
+          &#10003;
+        </button>
       </div>
       <form class="search">
         <div class="search__filter">
@@ -116,6 +144,13 @@ const openWindow = () => {
       outline: none;
       background-color: transparent;
       color: #ea3b51;
+
+      &:hover {
+        color: #5e5adb;
+      }
+    }
+    .confirm {
+      color: green;
 
       &:hover {
         color: #5e5adb;

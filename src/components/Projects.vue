@@ -1,7 +1,16 @@
 <script setup lang="ts">
-import { useProjectDate } from "@/store/projectDate";
+import { Options, useProjectDate } from "@/store/projectDate";
+import { useProjectManipulation } from "@/store/projectManipulation";
+import { ref, watch } from "vue";
 
 const date = useProjectDate();
+const selected = useProjectManipulation();
+const selectedDate = ref<Options[]>([]);
+
+watch(selectedDate, (newValue) => {
+  selected.selectedProject = newValue;
+  selected.count = newValue.length;
+});
 </script>
 
 <template>
@@ -16,6 +25,8 @@ const date = useProjectDate();
           type="checkbox"
           :name="element.name"
           :id="`${element.name} checkbox #${i + 1}`"
+          :value="element"
+          v-model="selectedDate"
         />
       </div>
       <div class="projects__project-index">
