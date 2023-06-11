@@ -4,6 +4,7 @@ import { DatePickerInstance } from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
 import { Options, useProjectDate } from "@/store/projectDate.ts";
 import { reactive, ref, watch, watchEffect } from "vue";
+import { computed } from "@vue/reactivity";
 
 interface Status {
   status: string;
@@ -55,11 +56,22 @@ const statusInput = ref<Status[]>([
   },
 ]);
 
+const nameVarification = computed(() => {
+  for (const name of projectDate.projectsNames) {
+    if (name === updateOption.name) {
+      return true;
+    }
+  }
+
+  return false;
+});
+
 const addAndClose = () => {
   if (updateOption.status === "Not Started") {
     updateOption.timeline = null;
   }
-  if (updateOption.name.trim() === "") {
+
+  if (updateOption.name.trim() === "" || nameVarification.value) {
     redStyle.value = true;
     updateOption.name = "";
   } else if (
@@ -132,6 +144,9 @@ watch(updateOption, (newValue) => {
       <div class="project-name">
         <label for="projectName" class="project-name__label">
           Project name
+          <span v-if="redStyle === true" style="color: #ff0000">
+            incorect value or name already exist
+          </span>
         </label>
         <input
           type="text"
@@ -259,8 +274,8 @@ watch(updateOption, (newValue) => {
     }
 
     .error {
-      border-color: red;
-      outline-color: red;
+      border-color: #ff0000;
+      outline-color: #ff0000;
     }
 
     &__input {

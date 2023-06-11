@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { reactive, ref } from "vue";
+import { computed, reactive, ref } from "vue";
 
 export interface Options {
   name: string;
@@ -10,6 +10,7 @@ export interface Options {
 
 export const useProjectDate = defineStore("project-date", () => {
   const projectOptions = ref<Options[]>([]);
+  const projectArchived = ref<Options[]>([]);
 
   const newProjectAdd = (updateOption: Options) => {
     const newOption = reactive<Options>({
@@ -22,5 +23,9 @@ export const useProjectDate = defineStore("project-date", () => {
     projectOptions.value.push(newOption);
   };
 
-  return { projectOptions, newProjectAdd };
+  const projectsNames = computed(() => {
+    return projectOptions.value.map((item) => item.name);
+  });
+
+  return { projectOptions, projectArchived, newProjectAdd, projectsNames };
 });

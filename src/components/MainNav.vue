@@ -5,6 +5,7 @@ import { useProjectManipulation } from "@/store/projectManipulation";
 import { useProjectDate } from "@/store/projectDate";
 import MainNavGroup from "@/components/MainNavGroup.vue";
 import CreateProject from "@/components/CreateProject.vue";
+import { computed } from "@vue/reactivity";
 
 let selectIndex = useSelectIndex();
 let selected = useProjectManipulation();
@@ -22,14 +23,29 @@ const openWindow = () => {
   windowOpen.value = !windowOpen.value;
 };
 
+const nameIndex = computed(() => {
+  const indexArr = ref<number[]>([]);
+  selected.selectedProject.forEach((item) => {
+    let index: number = porjectDate.projectOptions.findIndex(
+      (obj) => obj.name === item.name
+    );
+    indexArr.value.push(index);
+  });
+  return indexArr;
+});
+
 const actionAcept = () => {
-  if (action.value === "Delete" && selected.selectedProject.length > 0) {
-    selected.selectedProject.forEach((item) => {
-      let index = porjectDate.projectOptions.findIndex(
-        (obj) => obj.name === item.name
-      );
-      porjectDate.projectOptions.splice(index, 1);
-    });
+  if (selected.selectedProject.length > 0) {
+    if (action.value === "Delete") {
+      nameIndex.value.value.forEach((index) => {
+        porjectDate.projectOptions.splice(index, 1);
+      });
+    } else if (action.value === "Archive") {
+      nameIndex.value.value.forEach((index) => {
+        porjectDate.projectArchived.push(porjectDate.projectOptions[index]);
+        porjectDate.projectOptions.splice(index, 1);
+      });
+    }
 
     selected.selectedProject.length = 0;
     selected.count = 0;
