@@ -1,13 +1,15 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { useProjectDate } from "@/store/projectDate";
 
-let count = ref(0);
+const date = useProjectDate();
 </script>
 
 <template>
   <div class="header">
     <h1 class="header__title">Projects</h1>
-    <div class="header__count">{{ count }}</div>
+    <div class="header__count">
+      {{ date.projectOptions.length + date.projectArchived.length }}
+    </div>
   </div>
 </template>
 

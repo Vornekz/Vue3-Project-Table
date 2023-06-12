@@ -3,17 +3,16 @@ import { ref } from "vue";
 import { useSelectIndex } from "@/store/selectIndex";
 import { useProjectManipulation } from "@/store/projectManipulation";
 import { useProjectDate } from "@/store/projectDate";
-import MainNavGroup from "@/components/MainNavGroup.vue";
-import CreateProject from "@/components/CreateProject.vue";
+import MainNavGroup from "@/components/nav-components/MainNavGroup.vue";
+import CreateProject from "@/components/nav-components/CreateProject.vue";
 import { computed } from "@vue/reactivity";
 
-let selectIndex = useSelectIndex();
-let selected = useProjectManipulation();
+const selectIndex = useSelectIndex();
+const selected = useProjectManipulation();
 const porjectDate = useProjectDate();
-let selectFilterElement = selectIndex.selectFilterElement;
 const action = ref("Actions");
-let windowOpen = ref(false);
-let filterSelect = ref("All");
+const windowOpen = ref(false);
+const filterSelect = ref("All");
 
 const changeName = () => {
   filterSelect.value = selectIndex.newName;
@@ -91,7 +90,7 @@ const actionAcept = () => {
             id="group"
             class="search__filter-select"
             v-model="filterSelect"
-            @change="selectFilterElement(filterSelect)"
+            @change="selectIndex.selectFilterElement(filterSelect)"
           >
             <option value="All" selected>All</option>
             <option value="Not started">Not started</option>

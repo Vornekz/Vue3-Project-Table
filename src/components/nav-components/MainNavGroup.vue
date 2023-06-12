@@ -17,16 +17,17 @@ const select = (i: number) => {
 
 <template>
   <div class="group">
-    <div
+    <router-link
       class="group__element"
       v-for="(element, i) in group"
       :key="`element-${i}`"
       :class="{ selected: element.selected }"
       @click="select(i)"
+      :to="{ name: element.name }"
     >
       <p class="group__element-text">{{ element.name }}</p>
       <span class="group__element-count">{{ element.count }}</span>
-    </div>
+    </router-link>
   </div>
 </template>
 
@@ -39,15 +40,15 @@ const select = (i: number) => {
   grid-column-gap: 20px;
   padding: 10px 30px;
 
-  div:last-child {
+  a:last-child {
     &:after {
       content: "";
       display: block;
       position: absolute;
       left: -10%;
-      width: 1px;
+      width: 2px;
       height: 100%;
-      background-color: #d5dbe5;
+      background-color: #5e5adb;
     }
   }
 

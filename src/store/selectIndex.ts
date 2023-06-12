@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
+import { useRouter } from "vue-router";
 
 export const useSelectIndex = defineStore("select-index", () => {
   interface GroupType {
@@ -48,10 +49,14 @@ export const useSelectIndex = defineStore("select-index", () => {
 
   const selectedIndex = ref(0);
   const newName = ref("All");
+  const router = useRouter();
 
   const selectFilterElement = (select: string) => {
     let newIndex = ref(group.value.findIndex((item) => item.name === select));
     selectElement(newIndex.value);
+    router.push({
+      name: group.value[selectedIndex.value].name,
+    });
   };
 
   const selectElement = (index: number) => {

@@ -1,9 +1,12 @@
 <script setup lang="ts">
-import { Options, useProjectDate } from "@/store/projectDate";
+import { Options } from "@/store/projectDate";
 import { useProjectManipulation } from "@/store/projectManipulation";
 import { ref, watch } from "vue";
 
-const date = useProjectDate();
+defineProps<{
+  date: Options[];
+  keyId: string;
+}>();
 const selected = useProjectManipulation();
 const selectedDate = ref<Options[]>([]);
 
@@ -17,14 +20,14 @@ watch(selectedDate, (newValue) => {
   <div class="projects">
     <div
       class="projects__project"
-      v-for="(element, i) in date.projectOptions"
-      :key="`${element.name} ${i + 1}`"
+      v-for="(element, i) in date"
+      :key="`${element.name} ${i + 1} ${keyId}`"
     >
       <div class="projects__project-checkbox">
         <input
           type="checkbox"
           :name="element.name"
-          :id="`${element.name} checkbox #${i + 1}`"
+          :id="`${element.name} checkbox #${i + 1} ${keyId}`"
           :value="element"
           v-model="selectedDate"
         />

@@ -28,14 +28,14 @@ const datepickerRange = ref<DatePickerInstance>(null);
 
 const updateOption = reactive<Options>({
   name: "",
-  status: "Not Started",
+  status: "Not started",
   select: "start",
   timeline: new Date(),
 });
 
 const statusInput = ref<Status[]>([
   {
-    status: "Not Started",
+    status: "Not started",
     id: "notStarted",
   },
   {
@@ -43,7 +43,7 @@ const statusInput = ref<Status[]>([
     id: "planing",
   },
   {
-    status: "In Progress",
+    status: "In progress",
     id: "inProgress",
   },
   {
@@ -67,7 +67,7 @@ const nameVarification = computed(() => {
 });
 
 const addAndClose = () => {
-  if (updateOption.status === "Not Started") {
+  if (updateOption.status === "Not started") {
     updateOption.timeline = null;
   }
 
@@ -90,7 +90,7 @@ const addAndClose = () => {
 const reset = () => {
   updateOption.name = "";
   updateOption.select = "start";
-  updateOption.status = "Not Started";
+  updateOption.status = "Not started";
   updateOption.timeline = new Date();
   select.value = "start";
 };
@@ -183,7 +183,7 @@ watch(updateOption, (newValue) => {
       </div>
       <div
         class="project-timeline"
-        v-if="updateOption.status !== 'Not Started'"
+        v-if="updateOption.status !== 'Not started'"
       >
         <h4 class="project-timeline__title">Project timeline</h4>
         <select
