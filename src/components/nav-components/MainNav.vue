@@ -2,7 +2,7 @@
 import { ref } from "vue";
 import { useSelectIndex } from "@/store/selectIndex";
 import { useProjectManipulation } from "@/store/projectManipulation";
-import { useProjectDate } from "@/store/projectDate";
+import { Options, useProjectDate } from "@/store/projectDate";
 import MainNavGroup from "@/components/nav-components/MainNavGroup.vue";
 import CreateProject from "@/components/nav-components/CreateProject.vue";
 import { computed } from "@vue/reactivity";
@@ -22,32 +22,59 @@ const openWindow = () => {
   windowOpen.value = !windowOpen.value;
 };
 
-const nameIndex = computed(() => {
+const nameIndex = (date: Options[]) => {
   const indexArr = ref<number[]>([]);
+
   selected.selectedProject.forEach((item) => {
-    let index: number = porjectDate.projectOptions.findIndex(
-      (obj) => obj.name === item.name
-    );
+    let index: number = date.findIndex((obj) => obj.name === item.name);
     indexArr.value.push(index);
   });
+  indexArr.value.sort((a, b) => b - a);
+
   return indexArr;
+};
+
+const archivedCheck = computed(() => {
+  if (filterSelect.value === "Archived") {
+    return nameIndex(porjectDate.projectArchived);
+  } else {
+    return nameIndex(porjectDate.projectOptions);
+  }
 });
 
 const actionAcept = () => {
   if (selected.selectedProject.length > 0) {
     if (action.value === "Delete") {
-      nameIndex.value.value.forEach((index) => {
-        porjectDate.projectOptions.splice(index, 1);
+      archivedCheck.value.value.forEach((index) => {
+        if (filterSelect.value === "Archived") {
+          selectIndex.projectCountDown(
+            porjectDate.projectArchived[index].status,
+            false
+          );
+          porjectDate.projectArchived.splice(index, 1);
+        } else {
+          selectIndex.projectCountDown(
+            porjectDate.projectOptions[index].status,
+            false
+          );
+          porjectDate.projectOptions.splice(index, 1);
+        }
       });
-    } else if (action.value === "Archive") {
-      nameIndex.value.value.forEach((index) => {
+    } else if (
+      action.value === "Archive" &&
+      filterSelect.value !== "Archived"
+    ) {
+      archivedCheck.value.value.forEach((index) => {
+        selectIndex.projectCountDown(
+          porjectDate.projectOptions[index].status,
+          true
+        );
         porjectDate.projectArchived.push(porjectDate.projectOptions[index]);
         porjectDate.projectOptions.splice(index, 1);
       });
     }
 
-    selected.selectedProject.length = 0;
-    selected.count = 0;
+    selected.checkFalse();
   }
 };
 </script>

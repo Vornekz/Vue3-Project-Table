@@ -51,6 +51,33 @@ export const useSelectIndex = defineStore("select-index", () => {
   const newName = ref("All");
   const router = useRouter();
 
+  const projectsCoutn = (projectStatus: string) => {
+    group.value.forEach((element) => {
+      if (element.name === projectStatus) {
+        element.count++;
+      }
+    });
+    group.value[0].count++;
+  };
+
+  const projectCountDown = (indexStatus: string, archived: boolean) => {
+    group.value.forEach((element) => {
+      if (element.name === indexStatus) {
+        if (group.value[group.value.length - 1].selected) {
+          if (!archived) {
+            group.value[group.value.length - 1].count--;
+          }
+        } else {
+          element.count--;
+          group.value[0].count--;
+          if (archived) {
+            group.value[group.value.length - 1].count++;
+          }
+        }
+      }
+    });
+  };
+
   const selectFilterElement = (select: string) => {
     let newIndex = ref(group.value.findIndex((item) => item.name === select));
     selectElement(newIndex.value);
@@ -72,5 +99,7 @@ export const useSelectIndex = defineStore("select-index", () => {
     newName,
     selectFilterElement,
     selectElement,
+    projectsCoutn,
+    projectCountDown,
   };
 });

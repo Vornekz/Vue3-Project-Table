@@ -6,7 +6,6 @@ const date = useProjectDate();
 const newDate = ref<Options[]>(
   [...date.projectOptions].filter((item) => item.status === "Planing")
 );
-
 const keyId = ref("Plan");
 
 watch(date.projectOptions, (newValue) => {

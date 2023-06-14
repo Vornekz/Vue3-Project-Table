@@ -8,7 +8,6 @@ export const useProjectManipulation = defineStore(
     const selectedProject = ref<Options[]>([]);
     const count = ref(0);
 
-    // const transferProjectDate = (date: Options[]) => {};
     const checkFalse = () => {
       selectedProject.value.length = 0;
       count.value = 0;

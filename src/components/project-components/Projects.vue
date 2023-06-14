@@ -2,22 +2,59 @@
 import { Options } from "@/store/projectDate";
 import { useProjectManipulation } from "@/store/projectManipulation";
 import { ref, watch } from "vue";
+import { onBeforeRouteLeave } from "vue-router";
 
-defineProps<{
+const props = defineProps<{
   date: Options[];
   keyId: string;
 }>();
 const selected = useProjectManipulation();
 const selectedDate = ref<Options[]>([]);
+const selectAll = ref(false);
+
+onBeforeRouteLeave((_to, _from, next) => {
+  selected.checkFalse();
+  next();
+});
 
 watch(selectedDate, (newValue) => {
   selected.selectedProject = newValue;
   selected.count = newValue.length;
+  if (selected.selectedProject.length === 0) {
+    selectAll.value = false;
+    console.log(selected.selectedProject.length);
+  }
+});
+
+watch(selectAll, (newValue) => {
+  if (newValue) {
+    selectedDate.value = [...props.date];
+  } else {
+    selected.checkFalse();
+  }
 });
 </script>
 
 <template>
   <div class="projects">
+    <div class="projects__project">
+      <div class="projects__project-checkbox">
+        <label class="selectAll" :for="`selectAll ${keyId}`">Select All</label>
+        <input type="checkbox" :id="`selectAll ${keyId}`" v-model="selectAll" />
+      </div>
+      <div class="projects__project-index">
+        <h4>№</h4>
+      </div>
+      <div class="projects__project-name">
+        <h4>Name</h4>
+      </div>
+      <div class="projects__project-status">
+        <h4>Status</h4>
+      </div>
+      <div class="projects__project-date project-date">
+        <h4>Timeline</h4>
+      </div>
+    </div>
     <div
       class="projects__project"
       v-for="(element, i) in date"
@@ -36,10 +73,10 @@ watch(selectedDate, (newValue) => {
         <p>№ {{ i + 1 }}</p>
       </div>
       <div class="projects__project-name">
-        <h4>Name: {{ element.name }}</h4>
+        <p>{{ element.name }}</p>
       </div>
       <div class="projects__project-status">
-        <p>Status: {{ element.status }}</p>
+        <p>{{ element.status }}</p>
       </div>
       <div class="projects__project-date project-date">
         <div
@@ -109,10 +146,18 @@ watch(selectedDate, (newValue) => {
     color: #4f5a65;
 
     &-checkbox {
+      position: relative;
       flex-basis: 5%;
       display: flex;
       justify-content: center;
       margin: 15px;
+
+      .selectAll {
+        width: 75px;
+        position: absolute;
+        bottom: 30px;
+        left: 0;
+      }
 
       input {
         width: 25px;
@@ -131,9 +176,7 @@ watch(selectedDate, (newValue) => {
     &-name {
       flex-basis: 40%;
       margin: 15px;
-      h4 {
-        font-size: 25px;
-      }
+      font-size: 25px;
     }
 
     &-status {

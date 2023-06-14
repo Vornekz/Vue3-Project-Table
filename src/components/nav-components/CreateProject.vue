@@ -5,6 +5,7 @@ import "@vuepic/vue-datepicker/dist/main.css";
 import { Options, useProjectDate } from "@/store/projectDate.ts";
 import { reactive, ref, watch, watchEffect } from "vue";
 import { computed } from "@vue/reactivity";
+import { useSelectIndex } from "@/store/selectIndex";
 
 interface Status {
   status: string;
@@ -20,6 +21,7 @@ const emit = defineEmits<{
 }>();
 
 const projectDate = useProjectDate();
+const index = useSelectIndex();
 const select = ref("start");
 const redStyle = ref(false);
 const redDateStyle = ref(false);
@@ -83,6 +85,7 @@ const addAndClose = () => {
   } else {
     redStyle.value = false;
     projectDate.newProjectAdd(updateOption);
+    index.projectsCoutn(updateOption.status);
     emit("closeOpenWindow");
   }
 };
@@ -241,6 +244,7 @@ watch(updateOption, (newValue) => {
   display: flex;
   flex-direction: column;
   position: absolute;
+  z-index: 2;
   left: 45%;
   top: 30%;
   width: 450px;
