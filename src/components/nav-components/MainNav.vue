@@ -186,6 +186,7 @@ const actionAcept = () => {
       outline: none;
       background-color: transparent;
       color: #ea3b51;
+      cursor: pointer;
 
       &:hover {
         color: #5e5adb;
@@ -256,6 +257,7 @@ const actionAcept = () => {
     @include searchBorder(130px, 6px);
     background-color: #5e5adb;
     color: #fff;
+    cursor: pointer;
 
     svg {
       fill: #fff;

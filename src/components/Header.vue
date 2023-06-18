@@ -20,7 +20,7 @@ const date = useProjectDate();
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 20px 30px;
+  padding: 5px 30px;
   background-color: #f7f9fc;
   text-align: center;
 
