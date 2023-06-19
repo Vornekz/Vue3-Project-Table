@@ -59,7 +59,7 @@ const statusInput = ref<Status[]>([
 ]);
 
 const nameVarification = computed(() => {
-  for (const name of projectDate.projectsNames) {
+  for (const name of projectDate.projectsNames.value) {
     if (name === updateOption.name) {
       return true;
     }

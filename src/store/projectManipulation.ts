@@ -7,12 +7,13 @@ export const useProjectManipulation = defineStore(
   () => {
     const selectedProject = ref<Options[]>([]);
     const count = ref(0);
+    const search = ref<string>("");
 
     const checkFalse = () => {
       selectedProject.value.length = 0;
       count.value = 0;
     };
 
-    return { selectedProject, count, checkFalse };
+    return { selectedProject, count, search, checkFalse };
   }
 );

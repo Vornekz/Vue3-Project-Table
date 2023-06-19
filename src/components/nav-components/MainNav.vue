@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import { useSelectIndex } from "@/store/selectIndex";
 import { useProjectManipulation } from "@/store/projectManipulation";
 import { Options, useProjectDate } from "@/store/projectDate";
@@ -60,10 +60,7 @@ const actionAcept = () => {
           porjectDate.projectOptions.splice(index, 1);
         }
       });
-    } else if (
-      action.value === "Archive" &&
-      filterSelect.value !== "Archived"
-    ) {
+    } else if (action.value === "Archive") {
       archivedCheck.value.value.forEach((index) => {
         selectIndex.projectCountDown(
           porjectDate.projectOptions[index].status,
@@ -77,6 +74,13 @@ const actionAcept = () => {
     selected.checkFalse();
   }
 };
+
+watch(
+  () => filterSelect.value,
+  () => {
+    action.value = "Actions";
+  }
+);
 </script>
 
 <template>
@@ -94,8 +98,10 @@ const actionAcept = () => {
           v-model="action"
         >
           <option value="Actions" selected hidden>Actions</option>
-          <option value="Edit">Edit</option>
-          <option value="Archive">Archive</option>
+          <option value="Edit" v-if="filterSelect !== 'Archived'">Edit</option>
+          <option value="Archive" v-if="filterSelect !== 'Archived'">
+            Archive
+          </option>
           <option value="Delete">Delete</option>
         </select>
         <button class="select__button" @click="selected.checkFalse">
@@ -140,6 +146,7 @@ const actionAcept = () => {
             id="search"
             class="search__input-place"
             placeholder="Search"
+            v-model="selected.search"
           />
         </div>
       </form>

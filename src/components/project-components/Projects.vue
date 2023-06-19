@@ -2,7 +2,6 @@
 import { Options } from "@/store/projectDate";
 import { useProjectManipulation } from "@/store/projectManipulation";
 import { onMounted, ref, watch, watchEffect } from "vue";
-import { onBeforeRouteLeave } from "vue-router";
 
 const props = defineProps<{
   date: Options[];
@@ -12,42 +11,37 @@ const selected = useProjectManipulation();
 const selectedDate = ref<Options[]>([]);
 const selectAll = ref(false);
 const newDate = ref<Options[][]>([]);
+const filterdDate = ref<Options[]>([]);
 const curentPage = ref(1);
 const pages = ref<number[]>([]);
 
-onBeforeRouteLeave((_to, _from, next) => {
-  selected.checkFalse();
-  next();
-});
-
 onMounted(() => {
-  for (let i = 1; i <= newDate.value.length; i++) {
+  selectAll.value = false;
+
+  for (let i = 1; i < newDate.value.length; i++) {
     pages.value.push(i);
   }
 });
 
-watchEffect(() => {
-  let startElement = ref(0);
-  let endElement = ref(4);
-  if (props.date.length >= 5) {
-    let partDate = ref<Options[]>([]);
-    newDate.value.length = 0;
-    for (let i = 0; i < props.date.length / 4; i++) {
-      partDate.value = props.date.slice(startElement.value, endElement.value);
-      newDate.value.push(partDate.value);
-      startElement.value = endElement.value;
-      endElement.value += 4;
+watch(
+  () => selected.search.length,
+  (newValue) => {
+    if (newValue > 0) {
+      selectAll.value = false;
     }
-  } else {
-    newDate.value = [[...props.date]];
   }
-});
+);
 
 watch(
   () => newDate.value.length,
   (newValue, oldValue) => {
-    if (newValue > oldValue) {
+    if (newValue - oldValue === 1) {
       pages.value.push(newValue);
+    } else {
+      pages.value.length = 0;
+      for (let i = 1; i <= newDate.value.length; i++) {
+        pages.value.push(i);
+      }
     }
   }
 );
@@ -63,9 +57,39 @@ watch(selectedDate, (newValue) => {
 
 watch(selectAll, (newValue) => {
   if (newValue) {
-    selectedDate.value = [...props.date];
+    selectedDate.value = [...filterdDate.value];
   } else {
     selected.checkFalse();
+  }
+});
+
+watchEffect(() => {
+  props.date;
+  let startElement = ref(0);
+  let endElement = ref(4);
+
+  if (selected.search.length > 0) {
+    filterdDate.value = props.date.filter((item) => {
+      return item.name.toLowerCase().includes(selected.search.toLowerCase());
+    });
+  } else {
+    filterdDate.value = props.date;
+  }
+
+  if (filterdDate.value.length >= 5) {
+    let partDate = ref<Options[]>([]);
+    newDate.value.length = 0;
+    for (let i = 0; i < filterdDate.value.length / 4; i++) {
+      partDate.value = filterdDate.value.slice(
+        startElement.value,
+        endElement.value
+      );
+      newDate.value.push(partDate.value);
+      startElement.value = endElement.value;
+      endElement.value += 4;
+    }
+  } else {
+    newDate.value = [[...filterdDate.value]];
   }
 });
 </script>
@@ -111,7 +135,7 @@ watch(selectAll, (newValue) => {
           />
         </div>
         <div class="projects__project-index">
-          <p>№ {{ i + 1 }}</p>
+          <p>№ {{ pageIndex * 4 + (i + 1) }}</p>
         </div>
         <div class="projects__project-name">
           <p>{{ element.name }}</p>

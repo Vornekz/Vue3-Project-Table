@@ -24,7 +24,15 @@ export const useProjectDate = defineStore("project-date", () => {
   };
 
   const projectsNames = computed(() => {
-    return projectOptions.value.map((item) => item.name);
+    let projectOptionsNames = ref<string[]>([]);
+    let projectArchivedNames = ref<string[]>([]);
+    let projectNames = ref<string[]>([]);
+    projectOptionsNames.value = projectOptions.value.map((item) => item.name);
+    projectArchivedNames.value = projectArchived.value.map((item) => item.name);
+    projectNames.value = [...projectOptionsNames.value].concat(
+      projectArchivedNames.value
+    );
+    return projectNames;
   });
 
   return { projectOptions, projectArchived, newProjectAdd, projectsNames };
