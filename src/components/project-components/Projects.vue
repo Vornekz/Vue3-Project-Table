@@ -1,7 +1,17 @@
 <script setup lang="ts">
 import { Options } from "@/store/projectDate";
 import { useProjectManipulation } from "@/store/projectManipulation";
-import { onMounted, ref, watch, watchEffect } from "vue";
+import { onMounted, reactive, ref, watch, watchEffect } from "vue";
+
+export interface Edit {
+  push: boolean;
+  name: string;
+  date: {
+    newName: string;
+    newStatus: string;
+    newTimeline: Date | Date[] | null;
+  };
+}
 
 const props = defineProps<{
   date: Options[];
@@ -14,14 +24,38 @@ const newDate = ref<Options[][]>([]);
 const filterdDate = ref<Options[]>([]);
 const curentPage = ref(1);
 const pages = ref<number[]>([]);
+const edit = reactive<Edit>({
+  push: false,
+  name: "",
+  date: {
+    newName: "",
+    newStatus: "",
+    newTimeline: new Date(),
+  },
+});
 
 onMounted(() => {
   selectAll.value = false;
 
-  for (let i = 1; i < newDate.value.length; i++) {
+  pages.value.length = 0;
+  for (let i = 1; i <= newDate.value.length; i++) {
     pages.value.push(i);
   }
 });
+
+const setEdit = (element: Options) => {
+  edit.push = !edit.push;
+  edit.name = element.name;
+  edit.date.newName = element.name;
+  edit.date.newStatus = element.status;
+  edit.date.newTimeline = element.timeline;
+};
+
+const closeEdit = () => {
+  edit.push = !edit.push;
+};
+
+const confirmEdit = () => {};
 
 watch(
   () => selected.search.length,
@@ -132,16 +166,38 @@ watchEffect(() => {
             :id="`${element.name} checkbox #${i + 1} ${keyId}`"
             :value="element"
             v-model="selectedDate"
+            v-if="!edit.push || edit.name !== newDate[pageIndex][i].name"
           />
         </div>
         <div class="projects__project-index">
           <p>№ {{ pageIndex * 4 + (i + 1) }}</p>
         </div>
         <div class="projects__project-name">
-          <p>{{ element.name }}</p>
+          <p v-if="!edit.push || edit.name !== newDate[pageIndex][i].name">
+            {{ element.name }}
+          </p>
+          <input
+            type="text"
+            v-if="edit.name === element.name && edit.push"
+            v-model="edit.date.newName"
+          />
         </div>
         <div class="projects__project-status">
-          <p>{{ element.status }}</p>
+          <p v-if="!edit.push || edit.name !== newDate[pageIndex][i].name">
+            {{ element.status }}
+          </p>
+          <select
+            name="editSelect"
+            class="projects__project-status"
+            v-model="edit.date.newStatus"
+            v-if="edit.name === element.name && edit.push"
+          >
+            <option value="Not started">Not started</option>
+            <option value="Planing">Planing</option>
+            <option value="In progress">In progress</option>
+            <option value="Completed">Completed</option>
+            <option value="Dropped">Dropped</option>
+          </select>
         </div>
         <div class="projects__project-date project-date">
           <div
@@ -191,6 +247,22 @@ watchEffect(() => {
             </p>
           </div>
         </div>
+        <button class="projects__project-edit" @click="setEdit(element)">
+          Edit
+        </button>
+        <button
+          class="projects__project-edit"
+          v-if="edit.name === element.name && edit.push"
+          @click="closeEdit"
+        >
+          Close
+        </button>
+        <button
+          class="projects__project-confirm"
+          v-if="edit.name === element.name && edit.push"
+        >
+          Confirm
+        </button>
       </div>
     </div>
 
@@ -207,6 +279,7 @@ watchEffect(() => {
 </template>
 
 <style scoped lang="scss">
+@import "@/assets/style/mixin";
 .projects {
   padding: 30px;
 
@@ -228,24 +301,15 @@ watchEffect(() => {
 
   &__project {
     display: flex;
+    position: relative;
     align-items: center;
     border: 3px solid rgb(163, 155, 155);
     border-radius: 10px;
-    height: 10vh;
+    min-height: 10vh;
     margin-bottom: 25px;
     padding: 0 25px;
     background-color: #f7f9fc;
     color: #4f5a65;
-
-    .fade-enter-active,
-    .fade-leave-active {
-      transition: opacity 0.5s;
-    }
-
-    .fade-enter,
-    .fade-leave-to {
-      opacity: 0;
-    }
 
     &-checkbox {
       position: relative;
@@ -276,9 +340,11 @@ watchEffect(() => {
     }
 
     &-name {
-      flex-basis: 40%;
+      flex-basis: 30%;
+      max-width: 375px;
       margin: 15px;
       font-size: 25px;
+      overflow-wrap: break-word;
     }
 
     &-status {
@@ -289,7 +355,7 @@ watchEffect(() => {
     }
 
     &-date {
-      flex-basis: 30%;
+      flex-basis: 35%;
       display: flex;
       justify-content: center;
       text-align: center;
@@ -300,6 +366,17 @@ watchEffect(() => {
         width: 15px;
         height: 15px;
       }
+    }
+
+    &-edit {
+      @include insideProjectButton();
+      border-top: 0;
+      border-right: 0;
+    }
+    &-confirm {
+      @include insideProjectButton(unset, 0.5px, 0.5px, unset);
+      border-bottom: 0;
+      border-right: 0;
     }
   }
 }

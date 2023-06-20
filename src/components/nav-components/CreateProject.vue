@@ -1,8 +1,6 @@
 <script setup lang="ts">
-import VueDatePicker from "@vuepic/vue-datepicker";
-import { DatePickerInstance } from "@vuepic/vue-datepicker";
-import "@vuepic/vue-datepicker/dist/main.css";
 import { Options, useProjectDate } from "@/store/projectDate.ts";
+import DatePicker from "@/components/project-components/DatePicker.vue";
 import { reactive, ref, watch, watchEffect } from "vue";
 import { computed } from "@vue/reactivity";
 import { useSelectIndex } from "@/store/selectIndex";
@@ -22,11 +20,8 @@ const emit = defineEmits<{
 
 const projectDate = useProjectDate();
 const index = useSelectIndex();
-const select = ref("start");
 const redStyle = ref(false);
 const redDateStyle = ref(false);
-const datepicker = ref<DatePickerInstance>(null);
-const datepickerRange = ref<DatePickerInstance>(null);
 
 const updateOption = reactive<Options>({
   name: "",
@@ -77,9 +72,8 @@ const addAndClose = () => {
     redStyle.value = true;
     updateOption.name = "";
   } else if (
-    (updateOption.status === "Completed" ||
-      updateOption.status === "Dropped") &&
-    updateOption.timeline === null
+    (updateOption.status !== "Not Started" && updateOption.timeline === null) ||
+    (Array.isArray(updateOption.timeline) && updateOption.timeline[1] === null)
   ) {
     redDateStyle.value = true;
   } else {
@@ -95,35 +89,12 @@ const reset = () => {
   updateOption.select = "start";
   updateOption.status = "Not started";
   updateOption.timeline = new Date();
-  select.value = "start";
 };
 
 watchEffect(() => {
   if (props.windowOpen === true) {
     updateOption.timeline = new Date();
     reset();
-  }
-});
-
-watchEffect(() => {
-  if (
-    updateOption.status === "Completed" ||
-    updateOption.status === "Dropped"
-  ) {
-    select.value = "range";
-  } else {
-    select.value = "start";
-  }
-});
-
-watch(select, (newValue) => {
-  if (newValue === "start" && datepicker) {
-    updateOption.timeline = new Date();
-    datepicker.value?.clearValue;
-  }
-  if (newValue === "range" && datepickerRange) {
-    updateOption.timeline = null;
-    datepickerRange.value?.clearValue;
   }
 });
 
@@ -156,7 +127,7 @@ watch(updateOption, (newValue) => {
           class="project-name__input"
           :class="{ error: redStyle }"
           required
-          maxlength="25"
+          maxlength="30"
           id="projectName"
           v-model="updateOption.name"
         />
@@ -184,51 +155,10 @@ watch(updateOption, (newValue) => {
           name="status"
         />
       </div>
-      <div
-        class="project-timeline"
-        v-if="updateOption.status !== 'Not started'"
-      >
-        <h4 class="project-timeline__title">Project timeline</h4>
-        <select
-          name="timeGroup"
-          id="timeGroup"
-          v-model="select"
-          class="project-timeline__select"
-        >
-          <option
-            value="start"
-            v-if="
-              updateOption.status !== 'Completed' &&
-              updateOption.status !== 'Dropped'
-            "
-          >
-            Start time
-          </option>
-          <option value="range">Range time</option>
-        </select>
-        <div class="project-timeline__date" v-if="select === 'start'">
-          <VueDatePicker
-            ref="datepicker"
-            v-model="updateOption.timeline"
-            format="MM/dd/yyyy HH:mm"
-            placeholder="DD/MM/YYYY"
-            :required="select === 'start'"
-          >
-          </VueDatePicker>
-        </div>
-        <div class="project-timeline__range" v-if="select === 'range'">
-          <VueDatePicker
-            ref="datepickerRange"
-            v-model="updateOption.timeline"
-            format="MM/dd/yyyy HH:mm - MM/dd/yyyy HH:mm"
-            placeholder="DD/MM/YYYY ~ DD/MM/YYYY"
-            :class="{ errorDate: redDateStyle }"
-            range
-            :required="select === 'range'"
-          >
-          </VueDatePicker>
-        </div>
-      </div>
+      <DatePicker
+        :update-option="updateOption"
+        :red-date-style="redDateStyle"
+      />
     </form>
     <footer class="create__footer">
       <button class="cancel" @click="$emit('closeOpenWindow')">Cancel</button>
@@ -316,37 +246,6 @@ watch(updateOption, (newValue) => {
 
     &__radio {
       display: none;
-    }
-  }
-
-  .project-timeline {
-    display: grid;
-    grid-template: 30px 60px / 1fr 1fr;
-    padding: 20px 0;
-
-    &__title {
-      grid-column-start: 1;
-      grid-column-end: 3;
-    }
-
-    &__select {
-      @include searchBorder(150px, 6px);
-      padding: 5px 10px;
-    }
-
-    &__date {
-      .mx-datepicker {
-        width: 150px;
-      }
-    }
-
-    &__range {
-      .errorDate {
-        border: 1px solid red;
-      }
-      .mx-datepicker {
-        width: 250px;
-      }
     }
   }
 

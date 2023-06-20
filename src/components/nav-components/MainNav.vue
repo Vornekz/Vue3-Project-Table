@@ -98,7 +98,6 @@ watch(
           v-model="action"
         >
           <option value="Actions" selected hidden>Actions</option>
-          <option value="Edit" v-if="filterSelect !== 'Archived'">Edit</option>
           <option value="Archive" v-if="filterSelect !== 'Archived'">
             Archive
           </option>

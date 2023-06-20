@@ -25,10 +25,10 @@ onMounted(() => {
 
 <style lang="scss" scoped>
 .fade-enter-active {
-  transition: opacity 3s;
+  transition: opacity 4s;
 }
 .fade-leave-active {
-  transition: opacity 0.4s ease;
+  transition: opacity 0.2s;
 }
 
 .fade-enter-from,

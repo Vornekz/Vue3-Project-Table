@@ -5,7 +5,7 @@ export interface Options {
   name: string;
   status: string;
   select: string;
-  timeline: Date | Date[] | null;
+  timeline: Date | any[] | null;
 }
 
 export const useProjectDate = defineStore("project-date", () => {
