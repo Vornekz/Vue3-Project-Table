@@ -1,44 +1,47 @@
 <script setup lang="ts">
-import { Options } from "@/store/projectDate";
+import { Options, useProjectData } from "@/store/projectData";
 import { useProjectManipulation } from "@/store/projectManipulation";
-import { onMounted, reactive, ref, watch, watchEffect } from "vue";
+import { computed, onMounted, reactive, ref, watch, watchEffect } from "vue";
+import { useCheck } from "@/composable/dataCheck";
+import DatePicker from "@/components/project-components/DatePicker.vue";
+import { useSelectIndex } from "@/store/selectIndex";
 
 export interface Edit {
   push: boolean;
   name: string;
-  date: {
-    newName: string;
-    newStatus: string;
-    newTimeline: Date | Date[] | null;
-  };
 }
 
 const props = defineProps<{
-  date: Options[];
+  data: Options[];
   keyId: string;
 }>();
 const selected = useProjectManipulation();
-const selectedDate = ref<Options[]>([]);
+const projectData = useProjectData();
+const projectIndex = useSelectIndex();
+const selectedData = ref<Options[]>([]);
 const selectAll = ref(false);
-const newDate = ref<Options[][]>([]);
-const filterdDate = ref<Options[]>([]);
+const newData = ref<Options[][]>([]);
+const filterdData = ref<Options[]>([]);
 const curentPage = ref(1);
 const pages = ref<number[]>([]);
+const redDateStyle = ref(false);
+const redStyle = ref(false);
 const edit = reactive<Edit>({
   push: false,
   name: "",
-  date: {
-    newName: "",
-    newStatus: "",
-    newTimeline: new Date(),
-  },
+});
+const editOption = ref<Options>({
+  name: "",
+  status: "Not started",
+  select: "start",
+  timeline: new Date(),
 });
 
 onMounted(() => {
   selectAll.value = false;
 
   pages.value.length = 0;
-  for (let i = 1; i <= newDate.value.length; i++) {
+  for (let i = 1; i <= newData.value.length; i++) {
     pages.value.push(i);
   }
 });
@@ -46,16 +49,69 @@ onMounted(() => {
 const setEdit = (element: Options) => {
   edit.push = !edit.push;
   edit.name = element.name;
-  edit.date.newName = element.name;
-  edit.date.newStatus = element.status;
-  edit.date.newTimeline = element.timeline;
+  editOption.value.name = element.name;
+  editOption.value.status = element.status;
+  editOption.value.select = element.select;
+  editOption.value.timeline = element.timeline;
 };
 
 const closeEdit = () => {
   edit.push = !edit.push;
+  editOption.value = {
+    name: "",
+    status: "Not started",
+    select: "start",
+    timeline: new Date(),
+  };
 };
 
-const confirmEdit = () => {};
+const nameVarification = computed(() => {
+  for (const name of projectData.projectsNames.value) {
+    if (name === editOption.value.name && name !== edit.name) {
+      return true;
+    }
+  }
+  return false;
+});
+
+const confirmEdit = (element: Options) => {
+  if (useCheck(editOption.value, nameVarification, redStyle, redDateStyle)) {
+  } else {
+    if (editOption.value.status === "Not started") {
+      editOption.value.timeline = null;
+    }
+    redStyle.value = false;
+    if (edit.push && element.name === edit.name) {
+      selected.selectedProject.push(element);
+      Object.assign(
+        projectData.projectOptions[
+          selected.nameIndex(projectData.projectOptions).value[0]
+        ],
+        editOption.value
+      );
+      selected.selectedProject.length = 0;
+      edit.push = !edit.push;
+    }
+  }
+};
+
+watch(
+  () => editOption.value.name,
+  (newValue) => {
+    if (newValue.trim() !== "") {
+      redStyle.value = false;
+    }
+  }
+);
+
+watch(
+  () => editOption.value.timeline,
+  (newValue) => {
+    if (newValue !== null) {
+      redDateStyle.value = false;
+    }
+  }
+);
 
 watch(
   () => selected.search.length,
@@ -67,63 +123,62 @@ watch(
 );
 
 watch(
-  () => newDate.value.length,
+  () => newData.value.length,
   (newValue, oldValue) => {
     if (newValue - oldValue === 1) {
       pages.value.push(newValue);
     } else {
       pages.value.length = 0;
-      for (let i = 1; i <= newDate.value.length; i++) {
+      for (let i = 1; i <= newData.value.length; i++) {
         pages.value.push(i);
       }
     }
   }
 );
 
-watch(selectedDate, (newValue) => {
+watch(selectedData, (newValue) => {
   selected.selectedProject = newValue;
   selected.count = newValue.length;
   if (selected.selectedProject.length === 0) {
     selectAll.value = false;
-    console.log(selected.selectedProject.length);
   }
 });
 
 watch(selectAll, (newValue) => {
   if (newValue) {
-    selectedDate.value = [...filterdDate.value];
+    selectedData.value = [...filterdData.value];
   } else {
     selected.checkFalse();
   }
 });
 
 watchEffect(() => {
-  props.date;
+  props.data;
   let startElement = ref(0);
   let endElement = ref(4);
 
   if (selected.search.length > 0) {
-    filterdDate.value = props.date.filter((item) => {
+    filterdData.value = props.data.filter((item) => {
       return item.name.toLowerCase().includes(selected.search.toLowerCase());
     });
   } else {
-    filterdDate.value = props.date;
+    filterdData.value = props.data;
   }
 
-  if (filterdDate.value.length >= 5) {
-    let partDate = ref<Options[]>([]);
-    newDate.value.length = 0;
-    for (let i = 0; i < filterdDate.value.length / 4; i++) {
-      partDate.value = filterdDate.value.slice(
+  if (filterdData.value.length >= 5) {
+    let partData = ref<Options[]>([]);
+    newData.value.length = 0;
+    for (let i = 0; i < filterdData.value.length / 4; i++) {
+      partData.value = filterdData.value.slice(
         startElement.value,
         endElement.value
       );
-      newDate.value.push(partDate.value);
+      newData.value.push(partData.value);
       startElement.value = endElement.value;
       endElement.value += 4;
     }
   } else {
-    newDate.value = [[...filterdDate.value]];
+    newData.value = [[...filterdData.value]];
   }
 });
 </script>
@@ -132,8 +187,15 @@ watchEffect(() => {
   <div class="projects">
     <div class="projects__project">
       <div class="projects__project-checkbox">
-        <label class="selectAll" :for="`selectAll ${keyId}`">Select All</label>
-        <input type="checkbox" :id="`selectAll ${keyId}`" v-model="selectAll" />
+        <label v-if="!edit.push" class="selectAll" :for="`selectAll ${keyId}`"
+          >Select All</label
+        >
+        <input
+          v-if="!edit.push"
+          type="checkbox"
+          :id="`selectAll ${keyId}`"
+          v-model="selectAll"
+        />
       </div>
       <div class="projects__project-index">
         <h4>№</h4>
@@ -150,7 +212,7 @@ watchEffect(() => {
     </div>
     <div
       class="project__page"
-      v-for="(page, pageIndex) in newDate"
+      v-for="(page, pageIndex) in newData"
       :key="`${curentPage} ${pageIndex} ${keyId}`"
     >
       <div
@@ -165,31 +227,32 @@ watchEffect(() => {
             :name="element.name"
             :id="`${element.name} checkbox #${i + 1} ${keyId}`"
             :value="element"
-            v-model="selectedDate"
-            v-if="!edit.push || edit.name !== newDate[pageIndex][i].name"
+            v-model="selectedData"
+            v-if="!edit.push"
           />
         </div>
         <div class="projects__project-index">
           <p>№ {{ pageIndex * 4 + (i + 1) }}</p>
         </div>
         <div class="projects__project-name">
-          <p v-if="!edit.push || edit.name !== newDate[pageIndex][i].name">
+          <p v-if="!edit.push || edit.name !== newData[pageIndex][i].name">
             {{ element.name }}
           </p>
           <input
             type="text"
             v-if="edit.name === element.name && edit.push"
-            v-model="edit.date.newName"
+            v-model="editOption.name"
+            :class="{ error: redStyle }"
           />
         </div>
         <div class="projects__project-status">
-          <p v-if="!edit.push || edit.name !== newDate[pageIndex][i].name">
+          <p v-if="!edit.push || edit.name !== newData[pageIndex][i].name">
             {{ element.status }}
           </p>
           <select
             name="editSelect"
             class="projects__project-status"
-            v-model="edit.date.newStatus"
+            v-model="editOption.status"
             v-if="edit.name === element.name && edit.push"
           >
             <option value="Not started">Not started</option>
@@ -199,7 +262,10 @@ watchEffect(() => {
             <option value="Dropped">Dropped</option>
           </select>
         </div>
-        <div class="projects__project-date project-date">
+        <div
+          class="projects__project-date project-date"
+          v-if="!edit.push || edit.name !== newData[pageIndex][i].name"
+        >
           <div
             class="project-date_single"
             v-if="!Array.isArray(element.timeline)"
@@ -247,12 +313,26 @@ watchEffect(() => {
             </p>
           </div>
         </div>
-        <button class="projects__project-edit" @click="setEdit(element)">
+        <DatePicker
+          class="projects__project-date project-date"
+          :update-option="editOption"
+          :red-date-style="redDateStyle"
+          v-if="edit.name === element.name && edit.push"
+        />
+        <button
+          class="projects__project-edit"
+          @click="setEdit(element)"
+          v-if="projectIndex.newName !== 'Archived'"
+        >
           Edit
         </button>
         <button
           class="projects__project-edit"
-          v-if="edit.name === element.name && edit.push"
+          v-if="
+            edit.name === element.name &&
+            edit.push &&
+            projectIndex.newName !== 'Archived'
+          "
           @click="closeEdit"
         >
           Close
@@ -260,6 +340,7 @@ watchEffect(() => {
         <button
           class="projects__project-confirm"
           v-if="edit.name === element.name && edit.push"
+          @click="confirmEdit(element)"
         >
           Confirm
         </button>
@@ -345,6 +426,11 @@ watchEffect(() => {
       margin: 15px;
       font-size: 25px;
       overflow-wrap: break-word;
+
+      .error {
+        border-color: #ff0000;
+        outline-color: #ff0000;
+      }
     }
 
     &-status {
@@ -381,3 +467,4 @@ watchEffect(() => {
   }
 }
 </style>
+@/store/projectData

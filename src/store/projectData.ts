@@ -5,10 +5,10 @@ export interface Options {
   name: string;
   status: string;
   select: string;
-  timeline: Date | any[] | null;
+  timeline: Date | Date[] | null;
 }
 
-export const useProjectDate = defineStore("project-date", () => {
+export const useProjectData = defineStore("project-data", () => {
   const projectOptions = ref<Options[]>([]);
   const projectArchived = ref<Options[]>([]);
 

@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import { useProjectDate } from "@/store/projectDate";
+import { useProjectData } from "@/store/projectData";
 
-const date = useProjectDate();
+const data = useProjectData();
 </script>
 
 <template>
   <div class="header">
     <h1 class="header__title">Projects</h1>
     <div class="header__count">
-      {{ date.projectOptions.length + date.projectArchived.length }}
+      {{ data.projectOptions.length + data.projectArchived.length }}
     </div>
   </div>
 </template>
@@ -34,3 +34,4 @@ const date = useProjectDate();
   }
 }
 </style>
+@/store/projectData

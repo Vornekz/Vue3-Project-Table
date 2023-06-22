@@ -1,17 +1,18 @@
 <script setup lang="ts">
 import Projects from "./Projects.vue";
-import { Options, useProjectDate } from "@/store/projectDate";
+import { Options, useProjectData } from "@/store/projectData";
 import { ref, watch } from "vue";
-const date = useProjectDate();
-const newDate = ref<Options[]>([...date.projectArchived]);
+const data = useProjectData();
+const newData = ref<Options[]>([...data.projectArchived]);
 const keyId = ref("Arch");
 
-watch(date.projectArchived, (newValue) => {
-  newDate.value = [...newValue];
+watch(data.projectArchived, (newValue) => {
+  newData.value = [...newValue];
 });
 </script>
 <template>
   <div class="archived">
-    <Projects :date="newDate" :key-id="keyId" />
+    <Projects :data="newData" :key-id="keyId" />
   </div>
 </template>
+@/store/projectData

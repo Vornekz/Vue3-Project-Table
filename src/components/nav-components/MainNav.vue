@@ -2,14 +2,14 @@
 import { ref, watch } from "vue";
 import { useSelectIndex } from "@/store/selectIndex";
 import { useProjectManipulation } from "@/store/projectManipulation";
-import { Options, useProjectDate } from "@/store/projectDate";
+import { useProjectData } from "@/store/projectData";
 import MainNavGroup from "@/components/nav-components/MainNavGroup.vue";
 import CreateProject from "@/components/nav-components/CreateProject.vue";
 import { computed } from "@vue/reactivity";
 
 const selectIndex = useSelectIndex();
 const selected = useProjectManipulation();
-const porjectDate = useProjectDate();
+const porjectData = useProjectData();
 const action = ref("Actions");
 const windowOpen = ref(false);
 const filterSelect = ref("All");
@@ -22,23 +22,11 @@ const openWindow = () => {
   windowOpen.value = !windowOpen.value;
 };
 
-const nameIndex = (date: Options[]) => {
-  const indexArr = ref<number[]>([]);
-
-  selected.selectedProject.forEach((item) => {
-    let index: number = date.findIndex((obj) => obj.name === item.name);
-    indexArr.value.push(index);
-  });
-  indexArr.value.sort((a, b) => b - a);
-
-  return indexArr;
-};
-
 const archivedCheck = computed(() => {
   if (filterSelect.value === "Archived") {
-    return nameIndex(porjectDate.projectArchived);
+    return selected.nameIndex(porjectData.projectArchived);
   } else {
-    return nameIndex(porjectDate.projectOptions);
+    return selected.nameIndex(porjectData.projectOptions);
   }
 });
 
@@ -48,26 +36,26 @@ const actionAcept = () => {
       archivedCheck.value.value.forEach((index) => {
         if (filterSelect.value === "Archived") {
           selectIndex.projectCountDown(
-            porjectDate.projectArchived[index].status,
+            porjectData.projectArchived[index].status,
             false
           );
-          porjectDate.projectArchived.splice(index, 1);
+          porjectData.projectArchived.splice(index, 1);
         } else {
           selectIndex.projectCountDown(
-            porjectDate.projectOptions[index].status,
+            porjectData.projectOptions[index].status,
             false
           );
-          porjectDate.projectOptions.splice(index, 1);
+          porjectData.projectOptions.splice(index, 1);
         }
       });
     } else if (action.value === "Archive") {
       archivedCheck.value.value.forEach((index) => {
         selectIndex.projectCountDown(
-          porjectDate.projectOptions[index].status,
+          porjectData.projectOptions[index].status,
           true
         );
-        porjectDate.projectArchived.push(porjectDate.projectOptions[index]);
-        porjectDate.projectOptions.splice(index, 1);
+        porjectData.projectArchived.push(porjectData.projectOptions[index]);
+        porjectData.projectOptions.splice(index, 1);
       });
     }
 
@@ -277,3 +265,4 @@ watch(
   width: 80%;
 }
 </style>
+@/store/projectData

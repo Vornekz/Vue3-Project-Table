@@ -1,19 +1,20 @@
 <script setup lang="ts">
 import Projects from "./Projects.vue";
-import { Options, useProjectDate } from "@/store/projectDate";
+import { Options, useProjectData } from "@/store/projectData";
 import { ref, watch } from "vue";
-const date = useProjectDate();
-const newDate = ref<Options[]>(
-  [...date.projectOptions].filter((item) => item.status === "Completed")
+const data = useProjectData();
+const newData = ref<Options[]>(
+  [...data.projectOptions].filter((item) => item.status === "Completed")
 );
 const keyId = ref("Comp");
 
-watch(date.projectOptions, (newValue) => {
-  newDate.value = [...newValue].filter((item) => item.status === "Completed");
+watch(data.projectOptions, (newValue) => {
+  newData.value = [...newValue].filter((item) => item.status === "Completed");
 });
 </script>
 <template>
   <div class="completed">
-    <Projects :date="newDate" :key-id="keyId" />
+    <Projects :data="newData" :key-id="keyId" />
   </div>
 </template>
+@/store/projectData

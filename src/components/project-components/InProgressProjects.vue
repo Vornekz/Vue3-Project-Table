@@ -1,19 +1,20 @@
 <script setup lang="ts">
 import Projects from "./Projects.vue";
-import { Options, useProjectDate } from "@/store/projectDate";
+import { Options, useProjectData } from "@/store/projectData";
 import { ref, watch } from "vue";
-const date = useProjectDate();
-const newDate = ref<Options[]>(
-  [...date.projectOptions].filter((item) => item.status === "In progress")
+const data = useProjectData();
+const newData = ref<Options[]>(
+  [...data.projectOptions].filter((item) => item.status === "In progress")
 );
 const keyId = ref("Prog");
 
-watch(date.projectOptions, (newValue) => {
-  newDate.value = [...newValue].filter((item) => item.status === "In progress");
+watch(data.projectOptions, (newValue) => {
+  newData.value = [...newValue].filter((item) => item.status === "In progress");
 });
 </script>
 <template>
   <div class="in-progress">
-    <Projects :date="newDate" :key-id="keyId" />
+    <Projects :data="newData" :key-id="keyId" />
   </div>
 </template>
+@/store/projectData

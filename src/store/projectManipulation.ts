@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { Options } from "./projectDate";
+import { Options } from "./projectData";
 import { ref } from "vue";
 
 export const useProjectManipulation = defineStore(
@@ -14,6 +14,18 @@ export const useProjectManipulation = defineStore(
       count.value = 0;
     };
 
-    return { selectedProject, count, search, checkFalse };
+    const nameIndex = (data: Options[]) => {
+      const indexArr = ref<number[]>([]);
+
+      selectedProject.value.forEach((item) => {
+        let index: number = data.findIndex((obj) => obj.name === item.name);
+        indexArr.value.push(index);
+      });
+      indexArr.value.sort((a, b) => b - a);
+
+      return indexArr;
+    };
+
+    return { selectedProject, count, search, checkFalse, nameIndex };
   }
 );

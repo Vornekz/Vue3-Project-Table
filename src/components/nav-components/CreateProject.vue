@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { Options, useProjectDate } from "@/store/projectDate.ts";
+import { Options, useProjectData } from "@/store/projectData.ts";
 import DatePicker from "@/components/project-components/DatePicker.vue";
 import { reactive, ref, watch, watchEffect } from "vue";
 import { computed } from "@vue/reactivity";
 import { useSelectIndex } from "@/store/selectIndex";
+import { useCheck } from "@/composable/dataCheck";
 
 interface Status {
   status: string;
@@ -18,7 +19,7 @@ const emit = defineEmits<{
   (e: "closeOpenWindow"): void;
 }>();
 
-const projectDate = useProjectDate();
+const projectData = useProjectData();
 const index = useSelectIndex();
 const redStyle = ref(false);
 const redDateStyle = ref(false);
@@ -54,31 +55,22 @@ const statusInput = ref<Status[]>([
 ]);
 
 const nameVarification = computed(() => {
-  for (const name of projectDate.projectsNames.value) {
+  for (const name of projectData.projectsNames.value) {
     if (name === updateOption.name) {
       return true;
     }
   }
-
   return false;
 });
 
 const addAndClose = () => {
-  if (updateOption.status === "Not started") {
-    updateOption.timeline = null;
-  }
-
-  if (updateOption.name.trim() === "" || nameVarification.value) {
-    redStyle.value = true;
-    updateOption.name = "";
-  } else if (
-    (updateOption.status !== "Not Started" && updateOption.timeline === null) ||
-    (Array.isArray(updateOption.timeline) && updateOption.timeline[1] === null)
-  ) {
-    redDateStyle.value = true;
+  if (useCheck(updateOption, nameVarification, redStyle, redDateStyle)) {
   } else {
+    if (updateOption.status === "Not started") {
+      updateOption.timeline = null;
+    }
     redStyle.value = false;
-    projectDate.newProjectAdd(updateOption);
+    projectData.newProjectAdd(updateOption);
     index.projectsCoutn(updateOption.status);
     emit("closeOpenWindow");
   }
@@ -107,6 +99,15 @@ watch(updateOption, (newValue) => {
     redDateStyle.value = false;
   }
 });
+
+watch(
+  () => updateOption.status,
+  (newValue) => {
+    if (newValue !== "Completed" && newValue !== "Dropped") {
+      updateOption.select = "start";
+    }
+  }
+);
 </script>
 
 <template>
@@ -274,3 +275,4 @@ watch(updateOption, (newValue) => {
   }
 }
 </style>
+@/store/projectData

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Options } from "@/store/projectDate";
+import { Options } from "@/store/projectData";
 import { ref, watch, watchEffect } from "vue";
 import "@vuepic/vue-datepicker/dist/main.css";
 import VueDatePicker from "@vuepic/vue-datepicker";
@@ -10,13 +10,17 @@ const props = defineProps<{
   redDateStyle: boolean;
 }>();
 
-const timeline = ref<Date | Date[] | null>(new Date());
+const timeline = ref<Date | Date[] | null>(props.updateOption.timeline);
 const newSelect = ref("");
 const datepicker = ref<DatePickerInstance>(null);
 const datepickerRange = ref<DatePickerInstance>(null);
 
 watch(timeline, (newValue) => {
   props.updateOption.timeline = newValue;
+});
+
+watch(newSelect, (newValue) => {
+  props.updateOption.select = newValue;
 });
 
 watchEffect(() => {
@@ -26,7 +30,7 @@ watchEffect(() => {
   ) {
     newSelect.value = "range";
   } else {
-    newSelect.value = "start";
+    newSelect.value = props.updateOption.select;
   }
 });
 
@@ -65,8 +69,8 @@ watch(newSelect, (newValue) => {
         v-model="timeline"
         format="MM/dd/yyyy HH:mm"
         placeholder="DD/MM/YYYY"
-        :class="{ errorDate: redDateStyle }"
         :required="newSelect === 'start'"
+        :state="!redDateStyle"
       >
       </VueDatePicker>
     </div>
@@ -76,13 +80,12 @@ watch(newSelect, (newValue) => {
         v-model="timeline"
         format="MM/dd/yyyy HH:mm - MM/dd/yyyy HH:mm"
         placeholder="DD/MM/YYYY ~ DD/MM/YYYY"
-        :class="{ errorDate: redDateStyle }"
         range
         :required="newSelect === 'range'"
+        :state="!redDateStyle"
       >
       </VueDatePicker>
     </div>
-    \
   </div>
 </template>
 
@@ -107,19 +110,13 @@ watch(newSelect, (newValue) => {
     .mx-datepicker {
       width: 150px;
     }
-
-    .errorDate {
-      border: 1px solid red;
-    }
   }
 
   &__range {
-    .errorDate {
-      border: 1px solid red;
-    }
     .mx-datepicker {
       width: 250px;
     }
   }
 }
 </style>
+@/store/projectData
