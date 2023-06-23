@@ -8,6 +8,7 @@ export const useProjectManipulation = defineStore(
     const selectedProject = ref<Options[]>([]);
     const count = ref(0);
     const search = ref<string>("");
+    const theme = ref(false);
 
     const checkFalse = () => {
       selectedProject.value.length = 0;
@@ -26,6 +27,16 @@ export const useProjectManipulation = defineStore(
       return indexArr;
     };
 
-    return { selectedProject, count, search, checkFalse, nameIndex };
+    const themeChange = () => (theme.value = !theme.value);
+
+    return {
+      selectedProject,
+      count,
+      search,
+      theme,
+      themeChange,
+      checkFalse,
+      nameIndex,
+    };
   }
 );

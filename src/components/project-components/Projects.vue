@@ -9,6 +9,7 @@ import { useSelectIndex } from "@/store/selectIndex";
 export interface Edit {
   push: boolean;
   name: string;
+  status: string;
 }
 
 const props = defineProps<{
@@ -29,6 +30,7 @@ const redStyle = ref(false);
 const edit = reactive<Edit>({
   push: false,
   name: "",
+  status: "",
 });
 const editOption = ref<Options>({
   name: "",
@@ -47,10 +49,10 @@ onMounted(() => {
 });
 
 const setEdit = (element: Options) => {
+  selected.checkFalse();
   edit.push = !edit.push;
-  edit.name = element.name;
-  editOption.value.name = element.name;
-  editOption.value.status = element.status;
+  edit.name = editOption.value.name = element.name;
+  edit.status = editOption.value.status = element.status;
   editOption.value.select = element.select;
   editOption.value.timeline = element.timeline;
 };
@@ -83,12 +85,16 @@ const confirmEdit = (element: Options) => {
     redStyle.value = false;
     if (edit.push && element.name === edit.name) {
       selected.selectedProject.push(element);
+      projectIndex.projectCountDown(edit.status, false);
+
       Object.assign(
         projectData.projectOptions[
           selected.nameIndex(projectData.projectOptions).value[0]
         ],
         editOption.value
       );
+
+      projectIndex.projectsCoutn(editOption.value.status);
       selected.selectedProject.length = 0;
       edit.push = !edit.push;
     }
@@ -185,7 +191,7 @@ watchEffect(() => {
 
 <template>
   <div class="projects">
-    <div class="projects__project">
+    <div class="projects__project" :class="{ black: selected.theme }">
       <div class="projects__project-checkbox">
         <label v-if="!edit.push" class="selectAll" :for="`selectAll ${keyId}`"
           >Select All</label
@@ -220,6 +226,7 @@ watchEffect(() => {
         class="projects__project"
         v-for="(element, i) in page"
         :key="`${element.name} ${i + 1} ${keyId}`"
+        :class="{ black: selected.theme }"
       >
         <div class="projects__project-checkbox">
           <input
@@ -323,6 +330,7 @@ watchEffect(() => {
           class="projects__project-edit"
           @click="setEdit(element)"
           v-if="projectIndex.newName !== 'Archived'"
+          :class="{ blue: selected.theme }"
         >
           Edit
         </button>
@@ -334,6 +342,7 @@ watchEffect(() => {
             projectIndex.newName !== 'Archived'
           "
           @click="closeEdit"
+          :class="{ blue: selected.theme }"
         >
           Close
         </button>
@@ -341,6 +350,7 @@ watchEffect(() => {
           class="projects__project-confirm"
           v-if="edit.name === element.name && edit.push"
           @click="confirmEdit(element)"
+          :class="{ blue: selected.theme }"
         >
           Confirm
         </button>
@@ -464,6 +474,15 @@ watchEffect(() => {
       border-bottom: 0;
       border-right: 0;
     }
+  }
+  .black {
+    background-color: #4f5a65;
+    color: #fff;
+  }
+
+  .blue {
+    background-color: #5e5adb;
+    color: #fff;
   }
 }
 </style>

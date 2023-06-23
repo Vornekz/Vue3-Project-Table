@@ -5,6 +5,7 @@ import { reactive, ref, watch, watchEffect } from "vue";
 import { computed } from "@vue/reactivity";
 import { useSelectIndex } from "@/store/selectIndex";
 import { useCheck } from "@/composable/dataCheck";
+import { useProjectManipulation } from "@/store/projectManipulation";
 
 interface Status {
   status: string;
@@ -21,6 +22,7 @@ const emit = defineEmits<{
 
 const projectData = useProjectData();
 const index = useSelectIndex();
+const manipulation = useProjectManipulation();
 const redStyle = ref(false);
 const redDateStyle = ref(false);
 
@@ -112,10 +114,14 @@ watch(
 
 <template>
   <section class="create" v-if="props.windowOpen">
-    <header class="create__header">
+    <header class="create__header" :class="{ grey: manipulation.theme }">
       <h3>Add new Project</h3>
     </header>
-    <form class="create__project" onsubmit="return false">
+    <form
+      class="create__project"
+      onsubmit="return false"
+      :class="{ blue: manipulation.theme }"
+    >
       <div class="project-name">
         <label for="projectName" class="project-name__label">
           Project name
@@ -161,7 +167,7 @@ watch(
         :red-date-style="redDateStyle"
       />
     </form>
-    <footer class="create__footer">
+    <footer class="create__footer" :class="{ grey: manipulation.theme }">
       <button class="cancel" @click="$emit('closeOpenWindow')">Cancel</button>
       <button class="add-project" @click="addAndClose">Add project</button>
     </footer>
@@ -218,6 +224,7 @@ watch(
       border: 1px #9fa5b0 solid;
       border-radius: 5px;
       padding-left: 10px;
+      color: #000;
     }
   }
 
@@ -243,6 +250,7 @@ watch(
       border: 1px #9fa5b0 solid;
       border-radius: 5px;
       cursor: pointer;
+      color: #000;
     }
 
     &__radio {
@@ -272,6 +280,13 @@ watch(
       border: none;
       color: #fff;
     }
+  }
+  .blue {
+    background-color: #181818ec;
+  }
+
+  .grey {
+    background-color: #34373a;
   }
 }
 </style>

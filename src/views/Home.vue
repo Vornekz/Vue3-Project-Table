@@ -3,7 +3,6 @@ import Header from "@/components/Header.vue";
 import MainNav from "@/components/nav-components/MainNav.vue";
 import { onMounted } from "vue";
 import { useRouter } from "vue-router";
-
 const router = useRouter();
 
 onMounted(() => {
@@ -16,19 +15,17 @@ onMounted(() => {
     <Header />
     <MainNav />
     <router-view v-slot="{ Component }">
-      <transition name="fade">
+      <Transition name="fade" mode="out-in">
         <component :is="Component" />
-      </transition>
+      </Transition>
     </router-view>
   </div>
 </template>
 
 <style lang="scss" scoped>
-.fade-enter-active {
-  transition: opacity 4s;
-}
+.fade-enter-active,
 .fade-leave-active {
-  transition: opacity 0.2s;
+  transition: 0.5s ease;
 }
 
 .fade-enter-from,

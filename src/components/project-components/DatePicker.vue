@@ -104,6 +104,8 @@ watch(newSelect, (newValue) => {
   &__select {
     @include searchBorder(150px, 6px);
     padding: 5px 10px;
+    background-color: #fff;
+    color: #000;
   }
 
   &__date {
@@ -119,4 +121,3 @@ watch(newSelect, (newValue) => {
   }
 }
 </style>
-@/store/projectData
