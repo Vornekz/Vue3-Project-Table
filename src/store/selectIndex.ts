@@ -93,6 +93,12 @@ export const useSelectIndex = defineStore("select-index", () => {
     group.value[selectedIndex.value].selected = true;
   };
 
+  const countLoad = async (): Promise<string> => {
+    const count = await localStorage.count;
+
+    return count;
+  };
+
   return {
     group,
     selectedIndex,
@@ -101,5 +107,6 @@ export const useSelectIndex = defineStore("select-index", () => {
     selectElement,
     projectsCoutn,
     projectCountDown,
+    countLoad,
   };
 });

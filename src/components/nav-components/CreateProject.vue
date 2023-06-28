@@ -6,6 +6,7 @@ import { computed } from "@vue/reactivity";
 import { useSelectIndex } from "@/store/selectIndex";
 import { useCheck } from "@/composable/dataCheck";
 import { useProjectManipulation } from "@/store/projectManipulation";
+import { saveData } from "@/composable/dataLocalSave";
 
 interface Status {
   status: string;
@@ -30,7 +31,7 @@ const updateOption = reactive<Options>({
   name: "",
   status: "Not started",
   select: "start",
-  timeline: new Date(),
+  timeline: new Date().toLocaleString(),
 });
 
 const statusInput = ref<Status[]>([
@@ -75,6 +76,7 @@ const addAndClose = () => {
     projectData.newProjectAdd(updateOption);
     index.projectsCoutn(updateOption.status);
     emit("closeOpenWindow");
+    saveData();
   }
 };
 
@@ -82,12 +84,12 @@ const reset = () => {
   updateOption.name = "";
   updateOption.select = "start";
   updateOption.status = "Not started";
-  updateOption.timeline = new Date();
+  updateOption.timeline = new Date().toLocaleString();
 };
 
 watchEffect(() => {
   if (props.windowOpen === true) {
-    updateOption.timeline = new Date();
+    updateOption.timeline = new Date().toLocaleString();
     reset();
   }
 });
@@ -290,4 +292,3 @@ watch(
   }
 }
 </style>
-@/store/projectData

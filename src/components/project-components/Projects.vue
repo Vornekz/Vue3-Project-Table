@@ -5,6 +5,7 @@ import { computed, onMounted, reactive, ref, watch, watchEffect } from "vue";
 import { useCheck } from "@/composable/dataCheck";
 import DatePicker from "@/components/project-components/DatePicker.vue";
 import { useSelectIndex } from "@/store/selectIndex";
+import { saveData } from "@/composable/dataLocalSave";
 
 export interface Edit {
   push: boolean;
@@ -16,6 +17,7 @@ const props = defineProps<{
   data: Options[];
   keyId: string;
 }>();
+
 const selected = useProjectManipulation();
 const projectData = useProjectData();
 const projectIndex = useSelectIndex();
@@ -36,7 +38,7 @@ const editOption = ref<Options>({
   name: "",
   status: "Not started",
   select: "start",
-  timeline: new Date(),
+  timeline: new Date().toLocaleString(),
 });
 
 onMounted(() => {
@@ -63,7 +65,7 @@ const closeEdit = () => {
     name: "",
     status: "Not started",
     select: "start",
-    timeline: new Date(),
+    timeline: new Date().toLocaleString(),
   };
 };
 
@@ -76,7 +78,7 @@ const nameVarification = computed(() => {
   return false;
 });
 
-const confirmEdit = (element: Options) => {
+const confirmEdit = async (element: Options) => {
   if (useCheck(editOption.value, nameVarification, redStyle, redDateStyle)) {
   } else {
     if (editOption.value.status === "Not started") {
@@ -96,6 +98,7 @@ const confirmEdit = (element: Options) => {
 
       projectIndex.projectsCoutn(editOption.value.status);
       selected.selectedProject.length = 0;
+      saveData();
       edit.push = !edit.push;
     }
   }
@@ -283,9 +286,7 @@ watchEffect(() => {
               >
               <span v-else>Project start:</span>
               {{
-                element.timeline !== null
-                  ? element.timeline.toLocaleString()
-                  : "Without Date"
+                element.timeline !== null ? element.timeline : "Without Date"
               }}
             </p>
           </div>
@@ -294,7 +295,7 @@ watchEffect(() => {
               <span>Project start:</span>
               {{
                 element.timeline !== null
-                  ? (element.timeline as Date[])[0].toLocaleString()
+                  ? (element.timeline as string[])[0]
                   : "Without Date"
               }}
             </p>
@@ -314,7 +315,7 @@ watchEffect(() => {
               <span v-else>Project dropped</span>
               {{
                 element.timeline !== null
-                  ? (element.timeline as Date[])[1].toLocaleString()
+                  ? (element.timeline as string[])[1]
                   : ""
               }}
             </p>

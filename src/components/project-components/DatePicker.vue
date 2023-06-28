@@ -10,13 +10,22 @@ const props = defineProps<{
   redDateStyle: boolean;
 }>();
 
-const timeline = ref<Date | Date[] | null>(props.updateOption.timeline);
+const timeline = ref<Date | Date[] | null>(new Date());
 const newSelect = ref("");
 const datepicker = ref<DatePickerInstance>(null);
 const datepickerRange = ref<DatePickerInstance>(null);
 
 watch(timeline, (newValue) => {
-  props.updateOption.timeline = newValue;
+  if (newValue !== null) {
+    if (Array.isArray(newValue)) {
+      props.updateOption.timeline = [
+        newValue[0].toLocaleString(),
+        newValue[1].toLocaleString(),
+      ];
+    } else {
+      props.updateOption.timeline = newValue.toLocaleString();
+    }
+  }
 });
 
 watch(newSelect, (newValue) => {

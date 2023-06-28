@@ -5,7 +5,7 @@ export interface Options {
   name: string;
   status: string;
   select: string;
-  timeline: Date | Date[] | null;
+  timeline: string | string[] | null;
 }
 
 export const useProjectData = defineStore("project-data", () => {
@@ -35,5 +35,21 @@ export const useProjectData = defineStore("project-data", () => {
     return projectNames;
   });
 
-  return { projectOptions, projectArchived, newProjectAdd, projectsNames };
+  const projectLoad = async (): Promise<{
+    data: string | null;
+    archive: string | null;
+  }> => {
+    const data = await localStorage.data;
+    const archive = await localStorage.archived;
+
+    return { data, archive };
+  };
+
+  return {
+    projectOptions,
+    projectArchived,
+    newProjectAdd,
+    projectsNames,
+    projectLoad,
+  };
 });

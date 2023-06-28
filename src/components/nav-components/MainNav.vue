@@ -6,6 +6,7 @@ import { useProjectData } from "@/store/projectData";
 import MainNavGroup from "@/components/nav-components/MainNavGroup.vue";
 import CreateProject from "@/components/nav-components/CreateProject.vue";
 import { computed } from "@vue/reactivity";
+import { saveData } from "@/composable/dataLocalSave";
 
 const selectIndex = useSelectIndex();
 const selected = useProjectManipulation();
@@ -59,6 +60,7 @@ const actionAcept = () => {
       });
     }
 
+    saveData();
     selected.checkFalse();
   }
 };
