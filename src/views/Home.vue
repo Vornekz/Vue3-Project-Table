@@ -2,12 +2,14 @@
 import Header from "@/components/Header.vue";
 import MainNav from "@/components/nav-components/MainNav.vue";
 import { useProjectData } from "@/store/projectData";
+import { useProjectManipulation } from "@/store/projectManipulation";
 import { useSelectIndex } from "@/store/selectIndex";
 import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 const router = useRouter();
 const projectData = useProjectData();
 const selectIndex = useSelectIndex();
+const manipulation = useProjectManipulation();
 const dataReady = ref(false);
 
 onMounted(async () => {
@@ -32,6 +34,9 @@ onMounted(async () => {
       }
     }
   });
+  if (localStorage.theme !== undefined) {
+    manipulation.theme = JSON.parse(localStorage.theme);
+  }
 
   dataReady.value = true;
 });

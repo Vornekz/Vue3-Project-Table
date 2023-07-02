@@ -27,7 +27,10 @@ export const useProjectManipulation = defineStore(
       return indexArr;
     };
 
-    const themeChange = () => (theme.value = !theme.value);
+    const themeChange = () => {
+      theme.value = !theme.value;
+      localStorage.theme = JSON.stringify(theme.value);
+    };
 
     return {
       selectedProject,

@@ -322,7 +322,7 @@ watchEffect(() => {
           </div>
         </div>
         <DatePicker
-          class="projects__project-date project-date"
+          class="projects__project-date"
           :update-option="editOption"
           :red-date-style="redDateStyle"
           v-if="edit.name === element.name && edit.push"
@@ -373,7 +373,7 @@ watchEffect(() => {
 <style scoped lang="scss">
 @import "@/assets/style/mixin";
 .projects {
-  padding: 30px;
+  padding: 10px 30px;
 
   &__pages {
     width: fit-content;
@@ -393,13 +393,15 @@ watchEffect(() => {
 
   &__project {
     display: flex;
+    flex-wrap: wrap;
     position: relative;
     align-items: center;
+    justify-content: center;
     border: 3px solid rgb(163, 155, 155);
     border-radius: 10px;
     min-height: 10vh;
     margin-bottom: 25px;
-    padding: 0 25px;
+    padding-right: 75px;
     background-color: #f7f9fc;
     color: #4f5a65;
 
@@ -413,7 +415,7 @@ watchEffect(() => {
       .selectAll {
         width: 75px;
         position: absolute;
-        bottom: 30px;
+        top: 30px;
         left: 0;
       }
 
@@ -445,9 +447,10 @@ watchEffect(() => {
     }
 
     &-status {
-      flex-basis: 15%;
+      flex-basis: 10%;
       display: flex;
       justify-content: center;
+      margin: 0 5px;
       font-size: 20px;
     }
 
@@ -455,6 +458,8 @@ watchEffect(() => {
       flex-basis: 35%;
       display: flex;
       justify-content: center;
+      flex-wrap: wrap;
+      margin: 0 5px;
       text-align: center;
       font-size: 18px;
 

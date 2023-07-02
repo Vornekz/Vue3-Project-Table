@@ -36,8 +36,9 @@ const select = (i: number) => {
 .group {
   display: grid;
   position: relative;
-  grid-template-columns: 130px 130px 130px 130px 130px 130px 150px;
+  grid-template-columns: repeat(auto-fill, 130px);
   grid-column-gap: 20px;
+
   padding: 10px 30px;
 
   a:last-child {
@@ -58,6 +59,7 @@ const select = (i: number) => {
     justify-content: center;
     align-items: center;
     min-width: 125px;
+    margin: 10px;
     cursor: pointer;
 
     &:hover {

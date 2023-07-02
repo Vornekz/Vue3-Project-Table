@@ -101,18 +101,17 @@ watch(newSelect, (newValue) => {
 <style lang="scss" scoped>
 @import "@/assets/style/mixin";
 .project-timeline {
-  display: grid;
-  grid-template: 30px 60px / 1fr 1fr;
-  padding: 20px 0;
-
+  padding: 10px 0;
   &__title {
     grid-column-start: 1;
     grid-column-end: 3;
+    margin: 5px;
   }
 
   &__select {
     @include searchBorder(150px, 6px);
     padding: 5px 10px;
+    margin: 5px;
     background-color: #fff;
     color: #000;
   }
@@ -121,6 +120,7 @@ watch(newSelect, (newValue) => {
     .mx-datepicker {
       width: 150px;
     }
+    margin: 5px;
   }
 
   &__range {

@@ -154,17 +154,17 @@ watch(
 <style scoped lang="scss">
 @import "@/assets/style/mixin.scss";
 .mainNav {
-  display: grid;
-  grid-template-columns: 300px 300px 1fr;
-  grid-column-gap: 20px;
+  display: flex;
+  flex-wrap: wrap;
   align-items: center;
   padding: 30px;
 
   .select {
+    flex-basis: 300px;
     display: flex;
     justify-content: space-evenly;
     align-items: center;
-    margin-right: 40px;
+    margin: 10px 40px 10px 10px;
 
     &__label {
       span {
@@ -198,8 +198,10 @@ watch(
   }
 
   .search {
+    flex-basis: 300px;
     display: flex;
     align-items: center;
+    margin: 10px 20px 10px 10px;
 
     &__filter {
       position: relative;
@@ -246,10 +248,10 @@ watch(
 
   &__button {
     display: flex;
-    margin: 0 20px;
+    margin: 10px 20px;
+    margin-left: auto;
     align-items: center;
     justify-content: space-evenly;
-    justify-self: flex-end;
     @include searchBorder(130px, 6px);
     background-color: #5e5adb;
     color: #fff;

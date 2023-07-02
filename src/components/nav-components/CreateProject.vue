@@ -182,12 +182,14 @@ watch(
 .create {
   display: flex;
   flex-direction: column;
-  position: absolute;
+  position: fixed;
   z-index: 2;
-  left: 45%;
-  top: 30%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
   width: 450px;
-  height: 515px;
+  min-height: 515px;
   border: 2px rgba(70, 79, 96, 0.88) solid;
   border-radius: 15px;
   background-color: #e5e5e5;
